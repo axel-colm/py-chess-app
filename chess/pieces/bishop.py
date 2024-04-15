@@ -1,14 +1,14 @@
 from .piece import Piece
 from .color import Color
-from ..board.board import BoardException
+from ..board.board import BoardException, Board
 
 
 class Bishop(Piece):
 
     _VALUE = 3
 
-    def __init__(self, board, color: Color, position: tuple[int, int]):
-        super().__init__(color, position)
+    def __init__(self, board: Board, color: Color, position: tuple[int, int]):
+        Piece.__init__(self, color, position)
         self._board = board
 
     def move(self, end: tuple[int, int]):
