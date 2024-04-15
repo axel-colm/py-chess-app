@@ -1,2 +1,2 @@
-from piece import Piece
-from color import Color
+from .piece import Piece
+from .color import Color
