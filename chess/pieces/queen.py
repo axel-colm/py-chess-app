@@ -12,7 +12,12 @@ class Queen(Rook, Bishop):
         self._VALUE = 9
 
     def move(self, end: tuple[int, int]):
-        pass
+        if self.canMove(end):
+            self._board.setCase(self.getPosition()[0], self.getPosition()[1], None)
+            self._board.setCase(end[0], end[1], self)
+            self._position = end
+        else:
+            raise BoardException(3)
 
     def getMoves(self) -> list[tuple[int, int]]:
         moves = Rook.getMoves(self)
