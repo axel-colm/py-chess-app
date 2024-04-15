@@ -10,10 +10,25 @@ class King(Piece):
         self._value = 100
 
     def move(self, end: tuple[int, int]):
-        pass
+        if self.canMove(end):
+            self._board.setCase(self.getPosition()[0], self.getPosition()[1], None)
+            self._board.setCase(end[0], end[1], self)
+            self._position = end
+        else:
+            raise BoardException(3)
 
     def getMoves(self) -> list[tuple[int, int]]:
-        pass
+        x, y = self.getPosition()
+        moves = []
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if self.canMove((x + i, y + j)):
+                    moves.append((x + i, y + j))
+        return moves
 
     def canMove(self, end: tuple[int, int]):
-        pass
+        x1, y1 = self.getPosition()
+        x2, y2 = end
+        if abs(x1 - x2) <= 1 and abs(y1 - y2) <= 1:
+            return True
+        return False

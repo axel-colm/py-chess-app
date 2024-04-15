@@ -1,12 +1,13 @@
 from chess import Chess
 from chess.pieces import Color
 from chess.pieces.bishop import Bishop
+from chess.pieces.king import King
 from chess.pieces.queen import Queen
 from chess.pieces.pawn import Pawn
 
 board = Chess()
-p = Queen(board, Color.WHITE, (5, 3))
-p2 = Pawn(board, Color.BLACK, (5, 6))
+p = King(board, Color.WHITE, (5, 3))
+p2 = Pawn(board, Color.BLACK, (5, 4))
 board.setCase(*p.getPosition(), p)
 board.setCase(*p2.getPosition(), p2)
 moves = p.getMoves()
