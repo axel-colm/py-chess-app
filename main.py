@@ -1,14 +1,16 @@
 from chess import Chess
 from chess.pieces import Color
-from chess.pieces.rook import Rook
+from chess.pieces.bishop import Bishop
+from chess.pieces.queen import Queen
 from chess.pieces.pawn import Pawn
 
 board = Chess()
-p = Rook(board, Color.WHITE, (5, 3))
+p = Queen(board, Color.WHITE, (5, 3))
 p2 = Pawn(board, Color.BLACK, (5, 6))
 board.setCase(*p.getPosition(), p)
 board.setCase(*p2.getPosition(), p2)
 moves = p.getMoves()
+print(isinstance(p, Bishop))
 print(moves)
 for x in range(8):
     for y in range(8):

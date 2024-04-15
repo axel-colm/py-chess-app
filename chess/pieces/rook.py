@@ -8,7 +8,7 @@ class Rook(Piece):
     _VALUE = 5
 
     def __init__(self, board: Board, color: Color, position: tuple[int, int]):
-        super().__init__(color, position)
+        Piece.__init__(self, color, position)
         self._board = board
 
     def move(self, end: tuple[int, int]):
