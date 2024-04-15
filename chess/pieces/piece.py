@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 
 class Piece(ABC):
-    _position: tuple
+    _position: tuple[int, int]
     _color: Color
     _VALUE: int
 
@@ -17,7 +17,7 @@ class Piece(ABC):
     def getValue(self):
         return self._VALUE
 
-    def getPosition(self):
+    def getPosition(self) -> tuple[int, int]:
         return self._position
 
     @abstractmethod

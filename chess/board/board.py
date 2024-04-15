@@ -53,7 +53,11 @@ class Board(ABC):
                 if piece is None:
                     str_board += "."
                 else:
-                    str_board += str(piece.getColor().value)
+                    name = piece.__class__.__name__[:2]
+                    if name == "Kn":
+                        name = "N"
+                    color = piece.getColor().name[0].lower()
+                    str_board += f"{name[0]}{color}"
                 str_board += "\t"
             str_board += "\n"
         return str_board
