@@ -13,6 +13,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Chess")
         self.setMinimumSize(self.MINIMUM_SIZE)
 
+        self._board = Board()
+
+        self.setup_ui()
+
+
+    def setup_ui(self):
         self._central_widget = QtWidgets.QWidget()
         self.setCentralWidget(self._central_widget)
         self._central_widget.installEventFilter(self)
@@ -27,7 +33,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._content_widget = QtWidgets.QWidget()
         self._content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self._content_layout = QtWidgets.QVBoxLayout()
+        self._content_layout.setContentsMargins(2, 2, 2, 2)
+        self._content_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self._content_widget.setLayout(self._content_layout)
         self._layout.addWidget(self._content_widget)
+
+        self._board_widget = BoardWidget(self._board)
+        self._board_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self._content_layout.addWidget(self._board_widget)
+
+
+
 
 
     def eventFilter(self, watched, event):

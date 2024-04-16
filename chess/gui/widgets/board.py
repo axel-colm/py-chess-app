@@ -22,10 +22,44 @@ class BoardWidget(QtWidgets.QWidget):
         size = min(self.width(), self.height())
         square_size = size / max(self._board.BOARD_SIZE)
 
+        left = (self.width() - size) / 2
+        top = (self.height() - size) / 2
         for x in range(self._board.BOARD_SIZE[0]):
             for y in range(self._board.BOARD_SIZE[1]):
                 color = self._colors_black if (x + y) % 2 == 0 else self._colors_white
-                painter.fillRect(x * square_size, y * square_size, square_size, square_size, QtGui.QColor(color))
+                painter.setBrush(QtGui.QBrush(QtGui.QColor(color)))
+                painter.drawRect(
+                    x * square_size + left,
+                    y * square_size + top,
+                    square_size,
+                    square_size
+                )
+
+        # Draw numbers and letters
+
+        for y in range(self._board.BOARD_SIZE[0]):
+            color = self._colors_white if y % 2 == 0 else self._colors_black
+            painter.setPen(QtGui.QPen(QtGui.QColor(color)))
+            painter.drawText(
+                left + 2,
+                y * square_size + top + 2,
+                20,
+                20,
+                QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft,
+                str(y + 1)
+            )
+
+        for x in range(self._board.BOARD_SIZE[1]):
+            color = self._colors_black if x % 2 == 0 else self._colors_white
+            painter.setPen(QtGui.QPen(QtGui.QColor(color)))
+            painter.drawText(
+                left + x * square_size + square_size - 24,
+                top + size - 20,
+                20,
+                20,
+                QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight,
+                chr(ord("a") + x)
+            )
 
     def drawPieces(self, painter):
         pass
