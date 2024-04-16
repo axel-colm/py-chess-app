@@ -27,6 +27,12 @@ class Chess(Board):
             for x, piece in enumerate((Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)):
                 self.setCase(x, 0 if color == Color.WHITE else 7, piece(self, color, (x, 0 if color == Color.WHITE else 7)))
 
+        self._turn = Color.WHITE
+
+
+
+
+
 
 
 
