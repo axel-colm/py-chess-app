@@ -9,6 +9,7 @@ class BoardWidget(QtWidgets.QWidget):
     _colors_white = "#eeeed2"
 
     _case_selected: tuple[int, int] | None = None
+    movePiece = QtCore.Signal(tuple[int, int], tuple[int, int])
 
     def __init__(self, board: Chess):
         super().__init__()
@@ -103,7 +104,6 @@ class BoardWidget(QtWidgets.QWidget):
                         square_size
                     )
 
-
     def drawPieces(self, painter):
         size = min(self.width(), self.height())
         square_size = size / max(self._board.BOARD_SIZE)
@@ -142,16 +142,20 @@ class BoardWidget(QtWidgets.QWidget):
         if not self._board.isInside(x, y):
             return
 
+        if self._case_selected is not None:
+            piece = self._board.getCases(self._case_selected[0], self._case_selected[1])
+            if isinstance(piece, Piece) and piece.canMove((x, y)):
+                # self.movePiece.emit(self._case_selected, (x, y))
+                piece.move((x, y))
+                self._case_selected = None
+                self.update()
+                return
+
         if self._board.getCases(x, y) is not None:
             if self._case_selected == (x, y):
                 self._case_selected = None
             else:
                 self._case_selected = (x, y)
-
+        else:
+            self._case_selected = None
         self.update()
-
-
-
-
-
-

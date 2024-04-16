@@ -36,7 +36,7 @@ class Pawn(Piece):
         moves = []
 
         for x_shift in range(-1, 2, 1):
-            for y_shift in range(-1, 3, 1):
+            for y_shift in range(-2, 3, 1):
                 if self.canMove((self._position[0] + x_shift, self._position[1] + y_shift)):
                     moves.append((self._position[0] + x_shift, self._position[1] + y_shift))
         return moves

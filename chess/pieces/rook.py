@@ -32,14 +32,18 @@ class Rook(Piece):
     def canMove(self, end: tuple[int, int]):
         x1, y1 = self.getPosition()
         x2, y2 = end
+        if not self._board.isInside(x2, y2):
+            return False
+
+        case = self._board.getCases(x2, y2)
 
         if x1 == x2:
-            for y in range(min(y1, y2) + 1, max(y1, y2)):
-                if self._board.getCases(x1, y) is not None:
+            for i in range(min(y1, y2) + 1, max(y1, y2)):
+                if self._board.getCases(x1, i) is not None:
                     return False
-            return True
+            return case is None or case.getColor() != self.getColor()
         elif y1 == y2:
-            for x in range(min(x1, x2) + 1, max(x1, x2)):
-                if self._board.getCases(x, y1) is not None:
+            for i in range(min(x1, x2) + 1, max(x1, x2)):
+                if self._board.getCases(i, y1) is not None:
                     return False
-            return True
+            return case is None or case.getColor() != self.getColor()
