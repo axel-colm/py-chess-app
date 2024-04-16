@@ -1,6 +1,7 @@
 from .qt_core import *
 from .widgets.board import BoardWidget
 from .widgets.menu.menu import MenuWidget
+from .. import Chess
 from ..board import Board
 
 
@@ -13,10 +14,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Chess")
         self.setMinimumSize(self.MINIMUM_SIZE)
 
-        self._board = Board()
+        self._board = Chess()
+        self._board.initialize()
 
         self.setup_ui()
-
 
     def setup_ui(self):
         self._central_widget = QtWidgets.QWidget()
@@ -42,10 +43,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._board_widget = BoardWidget(self._board)
         self._board_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self._content_layout.addWidget(self._board_widget)
-
-
-
-
 
     def eventFilter(self, watched, event):
         if watched == self._central_widget and event.type() == QtCore.QEvent.Type.Paint:

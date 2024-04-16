@@ -28,6 +28,14 @@ class Board(ABC):
         self._board = [[None for _ in range(self.BOARD_SIZE[0])] for _ in range(self.BOARD_SIZE[1])]
         self._turn = None
 
+    @abstractmethod
+    def initialize(self):
+        pass
+
+
+
+
+
     def turnColor(self) -> Color | None:
         return self._turn
 

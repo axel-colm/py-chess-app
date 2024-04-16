@@ -1,12 +1,12 @@
+from ..core.functions import Function
 from ..qt_core import *
-from ...board import Board
-
+from ... import Chess
 
 class BoardWidget(QtWidgets.QWidget):
     _colors_black = "#769656"
     _colors_white = "#eeeed2"
 
-    def __init__(self, board: Board):
+    def __init__(self, board: Chess):
         super().__init__()
         self._board = board
 
@@ -62,5 +62,31 @@ class BoardWidget(QtWidgets.QWidget):
             )
 
     def drawPieces(self, painter):
-        pass
+        size = min(self.width(), self.height())
+        square_size = size / max(self._board.BOARD_SIZE)
+
+        left = (self.width() - size) / 2
+        top = (self.height() - size) / 2
+        for x in range(self._board.BOARD_SIZE[0]):
+            for y in range(self._board.BOARD_SIZE[1]):
+                piece = self._board.getCases(x, y)
+                if piece is not None:
+                    color = piece.getColor().name[0].lower()
+                    name = piece.__class__.__name__[:2].upper()
+
+                    icon_path = Function.icon_path(f"{color}{name}.svg")
+                    icon = QtGui.QIcon(icon_path)
+                    size = square_size * 0.9
+
+                    painter.drawPixmap(
+                        left + x * square_size + (square_size - size) / 2,
+                        top + y * square_size + (square_size - size) / 2,
+                        size,
+                        size,
+                        icon.pixmap(size, size)
+                    )
+
+
+
+
 
