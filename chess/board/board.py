@@ -1,4 +1,6 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+
+from ..pieces.color import Color
 from ..pieces.piece import Piece
 
 
@@ -19,9 +21,15 @@ class BoardException(Exception):
 class Board(ABC):
     BOARD_SIZE = (8, 8)
     _board: list[list[Piece | None]]
+    _moves_history: list[tuple[Piece, tuple[int, int], tuple[int, int]]]
+    _turn: Color | None
 
     def __init__(self):
         self._board = [[None for _ in range(self.BOARD_SIZE[0])] for _ in range(self.BOARD_SIZE[1])]
+        self._turn = None
+
+    def turnColor(self) -> Color | None:
+        return self._turn
 
     def getCases(self, x: int, y: int) -> Piece | None:
         if not self.isInside(x, y):
@@ -43,6 +51,7 @@ class Board(ABC):
             raise BoardException(2)
         if piece.canMove(end):
             piece.move(end)
+            self._moves_history.append((piece, start, end))
             return
         raise BoardException(3)
 
