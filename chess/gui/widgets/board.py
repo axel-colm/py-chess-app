@@ -1,10 +1,14 @@
 from ..core.functions import Function
 from ..qt_core import *
 from ... import Chess
+from ...pieces.piece import Piece
+
 
 class BoardWidget(QtWidgets.QWidget):
     _colors_black = "#769656"
     _colors_white = "#eeeed2"
+
+    _case_selected: tuple[int, int] | None = None
 
     def __init__(self, board: Chess):
         super().__init__()
@@ -14,9 +18,18 @@ class BoardWidget(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
+        pixmap = QtGui.QPixmap(self.size())
+        pixmap.fill(QtCore.Qt.GlobalColor.transparent)
 
-        self.drawBoard(painter)
-        self.drawPieces(painter)
+        p = QtGui.QPainter(pixmap)
+        p.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
+
+        self.drawBoard(p)
+        self.drawPieces(p)
+        p.end()
+
+        painter.drawPixmap(0, 0, pixmap)
 
     def drawBoard(self, painter):
         size = min(self.width(), self.height())
@@ -27,6 +40,7 @@ class BoardWidget(QtWidgets.QWidget):
         for x in range(self._board.BOARD_SIZE[0]):
             for y in range(self._board.BOARD_SIZE[1]):
                 color = self._colors_black if (x + y) % 2 == 0 else self._colors_white
+                painter.setPen(QtCore.Qt.PenStyle.NoPen)
                 painter.setBrush(QtGui.QBrush(QtGui.QColor(color)))
                 painter.drawRect(
                     x * square_size + left,
@@ -36,7 +50,6 @@ class BoardWidget(QtWidgets.QWidget):
                 )
 
         # Draw numbers and letters
-
         for y in range(self._board.BOARD_SIZE[0]):
             color = self._colors_white if y % 2 == 0 else self._colors_black
             painter.setPen(QtGui.QPen(QtGui.QColor(color)))
@@ -60,6 +73,36 @@ class BoardWidget(QtWidgets.QWidget):
                 QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight,
                 chr(ord("a") + x)
             )
+
+        # Draw case selected
+        if self._case_selected is not None:
+            x, y = self._case_selected
+            color = QtGui.QColor("#f0f000")
+            color.setAlpha(100)
+            painter.setPen(QtCore.Qt.PenStyle.NoPen)
+            painter.setBrush(QtGui.QBrush(color))
+            painter.drawRect(
+                left + x * square_size,
+                top + y * square_size,
+                square_size,
+                square_size
+            )
+
+            piece = self._board.getCases(x, y)
+            if isinstance(piece, Piece):
+                for move in piece.getMoves():
+                    x, y = move
+                    color = QtGui.QColor("#00f000")
+                    color.setAlpha(100)
+                    painter.setPen(QtCore.Qt.PenStyle.NoPen)
+                    painter.setBrush(QtGui.QBrush(color))
+                    painter.drawRect(
+                        left + x * square_size,
+                        top + y * square_size,
+                        square_size,
+                        square_size
+                    )
+
 
     def drawPieces(self, painter):
         size = min(self.width(), self.height())
@@ -85,6 +128,28 @@ class BoardWidget(QtWidgets.QWidget):
                         size,
                         icon.pixmap(size, size)
                     )
+
+    def mouseReleaseEvent(self, event):
+        size = min(self.width(), self.height())
+        square_size = size / max(self._board.BOARD_SIZE)
+
+        left = (self.width() - size) / 2
+        top = (self.height() - size) / 2
+
+        x = int((event.x() - left) // square_size)
+        y = int((event.y() - top) // square_size)
+
+        if not self._board.isInside(x, y):
+            return
+
+        if self._board.getCases(x, y) is not None:
+            if self._case_selected == (x, y):
+                self._case_selected = None
+            else:
+                self._case_selected = (x, y)
+
+        self.update()
+
 
 
 
