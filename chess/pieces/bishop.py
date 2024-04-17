@@ -21,31 +21,32 @@ class Bishop(Piece):
 
     def getMoves(self) -> list[tuple[int, int]]:
         moves = []
-        for x_shift in range(-1, 2, 2):
-            for y_shift in range(-1, 2, 2):
-                for i in range(1, 8):
-                    x = self.getPosition()[0] + i * x_shift
-                    y = self.getPosition()[1] + i * y_shift
-                    if self._board.isInside(x, y):
-                        piece = self._board.getCase(x, y)
-                        if piece is None:
-                            moves.append((x, y))
-                        else:
-                            if piece.getColor() != self.getColor():
-                                moves.append((x, y))
-                            break
-                    else:
-                        break
+        x, y = self.getPosition()
+        for i in range(1, max(self._board.BOARD_SIZE)):
+            if self.canMove((x + i, y + i)):
+                moves.append((x + i, y + i))
+            if self.canMove((x + i, y - i)):
+                moves.append((x + i, y - i))
+            if self.canMove((x - i, y + i)):
+                moves.append((x - i, y + i))
+            if self.canMove((x - i, y - i)):
+                moves.append((x - i, y - i))
         return moves
 
     def canMove(self, end: tuple[int, int]):
         x1, y1 = self.getPosition()
         x2, y2 = end
+        if not self._board.isInside(x2, y2):
+            return False
 
-        if abs(x1 - x2) == abs(y1 - y2):
-            for i in range(1, abs(x1 - x2)):
-                if self._board.getCase(x1 + i * (1 if x2 > x1 else -1), y1 + i * (1 if y2 > y1 else -1)) is not None:
+        dx, dy = x2 - x1, y2 - y1
+        if abs(dx) == abs(dy):
+            for i in range(1, abs(dx)):
+                x = x1 + i * (dx // abs(dx))
+                y = y1 + i * (dy // abs(dy))
+                if self._board.getCase(x, y) is not None:
                     return False
-            return True
+            case = self._board.getCase(x2, y2)
+            return (case is None or case.getColor() != self.getColor()) and not self._board.willBeCheck((x1, y1), end)
         return False
 

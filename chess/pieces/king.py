@@ -26,6 +26,15 @@ class King(Piece):
                     moves.append((x + i, y + j))
         return moves
 
+    def isCheck(self):
+        for x in range(self._board.BOARD_SIZE[0]):
+            for y in range(self._board.BOARD_SIZE[1]):
+                piece = self._board.getCase(x, y)
+                if isinstance(piece, Piece) and piece.getColor() != self.getColor():
+                    if piece.canMove(self.getPosition()):
+                        return True
+        return False
+
     def canMove(self, end: tuple[int, int]):
         x1, y1 = self.getPosition()
         x2, y2 = end
@@ -33,5 +42,5 @@ class King(Piece):
             return False
         case = self._board.getCase(x2, y2)
         if abs(x1 - x2) <= 1 and abs(y1 - y2) <= 1 if case is None or case.getColor() != self.getColor() else False:
-            return True
+            return not self._board.willBeCheck((x1, y1), end)
         return False
