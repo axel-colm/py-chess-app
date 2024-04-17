@@ -27,7 +27,7 @@ class Player(object):
 
     def move(self, start: tuple[int, int], end: tuple[int, int]):
         if self.isMyTurn():
-            case = self._board.getCases(start[0], start[1])
+            case = self._board.getCase(start[0], start[1])
             if case is not None and case.getColor() == self.getColor():
                 self._board.move(start, end)
                 return True
