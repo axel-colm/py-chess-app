@@ -5,6 +5,11 @@ from ...pieces.piece import Piece
 
 
 class BoardWidget(QtWidgets.QWidget):
+    released = QtCore.Signal(object)
+    clicked = QtCore.Signal(object)
+
+    BUTTON_SIZE = 50
+    BACK_ICON = Function.icon_path("angle-left.svg")
     _colors_black = "#769656"
     _colors_white = "#eeeed2"
 
@@ -14,6 +19,17 @@ class BoardWidget(QtWidgets.QWidget):
     def __init__(self, board: Chess):
         super().__init__()
         self._board = board
+
+        self.back_button = QtWidgets.QPushButton()
+        self.back_button.setParent(self)
+        self.back_button.setObjectName("back_button")
+        self.back_button.setIcon(QtGui.QIcon(self.BACK_ICON))
+        self.back_button.setIconSize(QtCore.QSizeF(self.BUTTON_SIZE * 0.7, self.BUTTON_SIZE * 0.7).toSize())
+        self.back_button.setGeometry(0, 0, self.BUTTON_SIZE, self.BUTTON_SIZE)
+        self.back_button.clicked.connect(lambda _, x=self.back_button: self.clicked.emit(x))
+        self.back_button.clicked.connect(lambda _, x=self.back_button: self.released.emit(x))
+        self.back_button.setStyleSheet("background-color: transparent; border: none;")
+
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
@@ -33,7 +49,7 @@ class BoardWidget(QtWidgets.QWidget):
         painter.drawPixmap(0, 0, pixmap)
 
     def drawBoard(self, painter):
-        size = min(self.width(), self.height())
+        size = min(self.width() - self.BUTTON_SIZE, self.height())
         square_size = size / max(self._board.BOARD_SIZE)
 
         left = (self.width() - size) / 2
@@ -144,11 +160,12 @@ class BoardWidget(QtWidgets.QWidget):
 
         if self._case_selected is not None:
             piece = self._board.getCases(self._case_selected[0], self._case_selected[1])
-            if isinstance(piece, Piece) and piece.canMove((x, y)):
-                # self.movePiece.emit(self._case_selected, (x, y))
-                piece.move((x, y))
-                self._case_selected = None
-                self.update()
+            if isinstance(piece, Piece) and piece.canMove((x, y)) :
+                if piece.getColor() == self._board.turnColor():
+                    # self.movePiece.emit(self._case_selected, (x, y))
+                    self._board.move(self._case_selected, (x, y))
+                    self._case_selected = None
+                    self.update()
                 return
 
         if self._board.getCases(x, y) is not None:

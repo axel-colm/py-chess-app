@@ -32,9 +32,13 @@ class Board(ABC):
     def initialize(self):
         pass
 
+    @abstractmethod
+    def getPlayer(self, color: Color) -> "Player":
+        pass
 
-
-
+    @abstractmethod
+    def getTurnPlayer(self) -> "Player":
+        pass
 
     def turnColor(self) -> Color | None:
         return self._turn
@@ -60,8 +64,12 @@ class Board(ABC):
         if piece.canMove(end):
             piece.move(end)
             self._moves_history.append((piece, start, end))
+            self._turn = Color.WHITE if self._turn == Color.BLACK else Color.BLACK
             return
         raise BoardException(3)
+
+    def history(self):
+        return self._moves_history
 
     def str(self):
         str_board = ""

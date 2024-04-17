@@ -1,6 +1,5 @@
 from .qt_core import *
 from .widgets.board import BoardWidget
-from .widgets.menu.menu import MenuWidget
 from .. import Chess
 from ..board import Board
 from ..pieces.color import Color
@@ -31,10 +30,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._layout.setContentsMargins(2, 2, 2, 2)
         self._central_widget.setLayout(self._layout)
 
-        self._menu = MenuWidget()
-        self._menu.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
-        # self._layout.addWidget(self._menu)
-
         self._content_widget = QtWidgets.QStackedWidget()
         self._content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
 
@@ -42,6 +37,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._board_widget = BoardWidget(self._board)
         self._board_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self._board_widget.clicked.connect(self._button_clicked)
+        self._board_widget.released.connect(self._button_released)
         self._content_widget.addWidget(self._board_widget)
 
         self._start_view = QtWidgets.QWidget()
@@ -65,6 +62,20 @@ class MainWindow(QtWidgets.QMainWindow):
     def _stop_game(self):
         self._content_widget.setCurrentWidget(self._start_view)
 
+    def _button_released(self, btn: QtWidgets.QWidget):
+        if btn.objectName() == "back_button":
+            dialog = QtWidgets.QMessageBox(self)
+            dialog.setWindowTitle("Quit game")
+            dialog.setText("Do you want to quit the game?")
+            dialog.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            dialog.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
+            if dialog.exec() == QtWidgets.QMessageBox.StandardButton.Yes:
+                self._stop_game()
+
+
+
+    def _button_clicked(self, btn):
+        pass
 
     def eventFilter(self, watched, event):
         if watched == self._central_widget and event.type() == QtCore.QEvent.Type.Paint:
