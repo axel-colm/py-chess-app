@@ -42,5 +42,5 @@ class King(Piece):
             return False
         case = self._board.getCase(x2, y2)
         if abs(x1 - x2) <= 1 and abs(y1 - y2) <= 1 if case is None or case.getColor() != self.getColor() else False:
-            return True
+            return not self._board.willBeCheck((x1, y1), end)
         return False

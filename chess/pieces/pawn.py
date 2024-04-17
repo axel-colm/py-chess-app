@@ -22,7 +22,7 @@ class Pawn(Piece):
         start_pos = 1 if self._color is Color.BLACK else self._board.BOARD_SIZE[1] - 2
 
         if dx == 0 and self._board.getCase(x2, y2) is None and (dy == direction or (y1 == start_pos and dy == 2 * direction and self.canMove((x1, y1 + direction)))):
-            return True
+            return not self._board.willBeCheck((x1, y1), end)
         elif abs(dx) == 1 and dy == direction:
             case = self._board.getCase(x2, y2)
             if isinstance(case, Piece):
@@ -32,7 +32,7 @@ class Pawn(Piece):
                 if last_move is not None:
                     piece, start, end = last_move
                     if isinstance(piece, Pawn) and  piece.getColor() != self._color and y1 == end[1] and abs(start[1] - end[1]) == 2 and abs(x1 - end[0]) == 1:
-                        return True
+                        return not self._board.willBeCheck((x1, y1), end)
         return False
 
     def getMoves(self) -> list[tuple[int, int]]:

@@ -51,6 +51,34 @@ class Board(ABC):
     def isInside(self, x: int, y: int) -> bool:
         return 0 <= x < self.BOARD_SIZE[0] and 0 <= y < self.BOARD_SIZE[1]
 
+    def isCheck(self, color: Color) -> bool:
+        king = None
+        for x in range(self.BOARD_SIZE[0]):
+            for y in range(self.BOARD_SIZE[1]):
+                piece = self.getCase(x, y)
+                if isinstance(piece, Piece) and piece.getColor() == color and piece.__class__.__name__ == "King":
+                    king = piece
+                    break
+        if king is None:
+            raise BoardException(2)
+        for x in range(self.BOARD_SIZE[0]):
+            for y in range(self.BOARD_SIZE[1]):
+                piece = self.getCase(x, y)
+                if isinstance(piece, Piece) and piece.getColor() != color:
+                    if piece.canMove(king.getPosition()):
+                        return True
+        return False
+
+    def willBeCheck(self, start: tuple[int, int], end: tuple[int, int]) -> bool:
+        case1 = self.getCase(start[0], start[1])
+        case2 = self.getCase(end[0], end[1])
+        self._board[start[0]][start[1]] = None
+        self._board[end[0]][end[1]] = case1
+        is_check = self.isCheck(case1.getColor())
+        self._board[start[0]][start[1]] = case1
+        self._board[end[0]][end[1]] = case2
+        return is_check
+
     def getBoard(self):
         return self._board
 
