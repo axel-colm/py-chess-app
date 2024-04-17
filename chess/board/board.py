@@ -66,6 +66,7 @@ class Board(ABC):
             self._moves_history.append((piece, start, end))
             self._turn = Color.WHITE if self._turn == Color.BLACK else Color.BLACK
             return
+
         raise BoardException(3)
 
     def history(self):

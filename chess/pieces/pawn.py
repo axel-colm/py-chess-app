@@ -1,5 +1,6 @@
 from .piece import Piece
 from .color import Color
+from .queen import Queen
 from ..board import Board
 
 
@@ -54,9 +55,11 @@ class Pawn(Piece):
                     self._board.setCase(end[0], end[1], None)
 
             self._board.setCase(self._position[0], self._position[1], None)
-            self._board.setCase(x2, y2, self)
-
-
+            # transform pawn to queen
+            if y2 == 0 or y2 == self._board.BOARD_SIZE[1] - 1:
+                self._board.setCase(x2, y2, Queen(self._board, self._color, (x2, y2)))
+            else:
+                self._board.setCase(x2, y2, self)
             self._position = (x2, y2)
 
 

@@ -111,7 +111,7 @@ class BoardWidget(QtWidgets.QWidget):
             )
 
             piece = self._board.getCase(x, y)
-            if isinstance(piece, Piece):
+            if isinstance(piece, Piece) and piece.getColor() == self._board.turnColor():
                 for move in piece.getMoves():
                     x, y = move
                     color = QtGui.QColor("#00f000")
@@ -124,6 +124,7 @@ class BoardWidget(QtWidgets.QWidget):
                         square_size,
                         square_size
                     )
+
 
     def drawPieces(self, painter):
         size = min(self.width(), self.height())
@@ -170,6 +171,9 @@ class BoardWidget(QtWidgets.QWidget):
                     # self.movePiece.emit(self._case_selected, (x, y))
                     self._board.move(self._case_selected, (x, y))
                     self._case_selected = None
+                    self.update()
+                else:
+                    self._case_selected = (x, y) if self._board.getCase(x, y) is not None else None
                     self.update()
                 return
 
