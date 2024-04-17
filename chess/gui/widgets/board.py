@@ -1,6 +1,7 @@
 from ..core.functions import Function
 from ..qt_core import *
 from ... import Chess
+from ...pieces.king import King
 from ...pieces.piece import Piece
 
 
@@ -125,7 +126,6 @@ class BoardWidget(QtWidgets.QWidget):
                         square_size
                     )
 
-
     def drawPieces(self, painter):
         size = min(self.width(), self.height())
         square_size = size / max(self._board.BOARD_SIZE)
@@ -136,6 +136,17 @@ class BoardWidget(QtWidgets.QWidget):
             for y in range(self._board.BOARD_SIZE[1]):
                 piece = self._board.getCase(x, y)
                 if piece is not None:
+                    if isinstance(piece, King) and piece.isCheck():
+                        color = QtGui.QColor("#ff0000")
+                        color.setAlpha(100)
+                        painter.setPen(QtCore.Qt.PenStyle.NoPen)
+                        painter.setBrush(QtGui.QBrush(color))
+                        painter.drawRect(
+                            left + x * square_size,
+                            top + y * square_size,
+                            square_size,
+                            square_size
+                        )
                     color = piece.getColor().name[0].lower()
                     name = piece.__class__.__name__[:2].upper()
 
