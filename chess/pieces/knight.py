@@ -28,6 +28,6 @@ class Knight(Piece):
 
         dx, dy = x2 - x1, y2 - y1
         if (dx, dy) in [(1, 2), (1, -2), (-1, 2), (-1, -2), (2, 1), (2, -1), (-2, 1), (-2, -1)]:
-            case = self._board.getCases(x2, y2)
+            case = self._board.getCase(x2, y2)
             return case is None or case.getColor() != self._color
         return False

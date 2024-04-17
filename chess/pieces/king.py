@@ -31,7 +31,7 @@ class King(Piece):
         x2, y2 = end
         if not self._board.isInside(x2, y2):
             return False
-        case = self._board.getCases(x2, y2)
+        case = self._board.getCase(x2, y2)
         if abs(x1 - x2) <= 1 and abs(y1 - y2) <= 1 if case is None or case.getColor() != self.getColor() else False:
             return True
         return False

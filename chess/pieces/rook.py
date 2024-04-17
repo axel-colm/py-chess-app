@@ -35,15 +35,15 @@ class Rook(Piece):
         if not self._board.isInside(x2, y2):
             return False
 
-        case = self._board.getCases(x2, y2)
+        case = self._board.getCase(x2, y2)
 
         if x1 == x2:
             for i in range(min(y1, y2) + 1, max(y1, y2)):
-                if self._board.getCases(x1, i) is not None:
+                if self._board.getCase(x1, i) is not None:
                     return False
             return case is None or case.getColor() != self.getColor()
         elif y1 == y2:
             for i in range(min(x1, x2) + 1, max(x1, x2)):
-                if self._board.getCases(i, y1) is not None:
+                if self._board.getCase(i, y1) is not None:
                     return False
             return case is None or case.getColor() != self.getColor()

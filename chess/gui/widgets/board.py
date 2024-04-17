@@ -26,10 +26,8 @@ class BoardWidget(QtWidgets.QWidget):
         self.back_button.setIcon(QtGui.QIcon(self.BACK_ICON))
         self.back_button.setIconSize(QtCore.QSizeF(self.BUTTON_SIZE * 0.7, self.BUTTON_SIZE * 0.7).toSize())
         self.back_button.setGeometry(0, 0, self.BUTTON_SIZE, self.BUTTON_SIZE)
-        self.back_button.clicked.connect(lambda _, x=self.back_button: self.clicked.emit(x))
-        self.back_button.clicked.connect(lambda _, x=self.back_button: self.released.emit(x))
+        self.back_button.released.connect(lambda x=self.back_button: self.released.emit(x))
         self.back_button.setStyleSheet("background-color: transparent; border: none;")
-
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
@@ -41,7 +39,6 @@ class BoardWidget(QtWidgets.QWidget):
         p = QtGui.QPainter(pixmap)
         p.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         p.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
-
         self.drawBoard(p)
         self.drawPieces(p)
         p.end()
@@ -67,8 +64,9 @@ class BoardWidget(QtWidgets.QWidget):
                 )
 
         # Draw numbers and letters
-        for y in range(self._board.BOARD_SIZE[0]):
+        for y in range(self._board.BOARD_SIZE[1]):
             color = self._colors_white if y % 2 == 0 else self._colors_black
+            inv_color = self._colors_black if y % 2 == 0 else self._colors_white
             painter.setPen(QtGui.QPen(QtGui.QColor(color)))
             painter.drawText(
                 left + 2,
@@ -76,11 +74,16 @@ class BoardWidget(QtWidgets.QWidget):
                 20,
                 20,
                 QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft,
-                str(y + 1)
+                str(self._board.BOARD_SIZE[1] - y)
             )
+            # Dessine les nombres mais dans l'autre sens donc à l'envers
+            painter.setTransform(QtGui.QTransform().rotate(180))
+            painter.setPen(QtGui.QPen(QtGui.QColor(inv_color)))
+            painter.setTransform(QtGui.QTransform())
 
-        for x in range(self._board.BOARD_SIZE[1]):
+        for x in range(self._board.BOARD_SIZE[0]):
             color = self._colors_black if x % 2 == 0 else self._colors_white
+            inv_color = self._colors_white if x % 2 == 0 else self._colors_black
             painter.setPen(QtGui.QPen(QtGui.QColor(color)))
             painter.drawText(
                 left + x * square_size + square_size - 24,
@@ -88,8 +91,10 @@ class BoardWidget(QtWidgets.QWidget):
                 20,
                 20,
                 QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignRight,
-                chr(ord("a") + x)
+                chr(65 + x)
             )
+            painter.setTransform(QtGui.QTransform())
+
 
         # Draw case selected
         if self._case_selected is not None:
@@ -105,7 +110,7 @@ class BoardWidget(QtWidgets.QWidget):
                 square_size
             )
 
-            piece = self._board.getCases(x, y)
+            piece = self._board.getCase(x, y)
             if isinstance(piece, Piece):
                 for move in piece.getMoves():
                     x, y = move
@@ -128,7 +133,7 @@ class BoardWidget(QtWidgets.QWidget):
         top = (self.height() - size) / 2
         for x in range(self._board.BOARD_SIZE[0]):
             for y in range(self._board.BOARD_SIZE[1]):
-                piece = self._board.getCases(x, y)
+                piece = self._board.getCase(x, y)
                 if piece is not None:
                     color = piece.getColor().name[0].lower()
                     name = piece.__class__.__name__[:2].upper()
@@ -159,7 +164,7 @@ class BoardWidget(QtWidgets.QWidget):
             return
 
         if self._case_selected is not None:
-            piece = self._board.getCases(self._case_selected[0], self._case_selected[1])
+            piece = self._board.getCase(self._case_selected[0], self._case_selected[1])
             if isinstance(piece, Piece) and piece.canMove((x, y)) :
                 if piece.getColor() == self._board.turnColor():
                     # self.movePiece.emit(self._case_selected, (x, y))
@@ -168,7 +173,7 @@ class BoardWidget(QtWidgets.QWidget):
                     self.update()
                 return
 
-        if self._board.getCases(x, y) is not None:
+        if self._board.getCase(x, y) is not None:
             if self._case_selected == (x, y):
                 self._case_selected = None
             else:

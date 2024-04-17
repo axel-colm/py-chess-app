@@ -17,19 +17,21 @@ class Pawn(Piece):
             return False
 
         dx, dy = x2 - x1, y2 - y1
-        direction = 1 if self._color is Color.WHITE else -1
-        start_pos = 1 if self._color is Color.WHITE else self._board.BOARD_SIZE[1] - 2
+        direction = 1 if self._color is Color.BLACK else -1
+        start_pos = 1 if self._color is Color.BLACK else self._board.BOARD_SIZE[1] - 2
 
-        if dx == 0 and self._board.getCases(x2, y2) is None and (dy == direction or (y1 == start_pos and dy == 2 * direction and self.canMove((x1, y1 + direction)))):
+        if dx == 0 and self._board.getCase(x2, y2) is None and (dy == direction or (y1 == start_pos and dy == 2 * direction and self.canMove((x1, y1 + direction)))):
             return True
         elif abs(dx) == 1 and dy == direction:
-            case = self._board.getCases(x2, y2)
-            case2 = self._board.getCases(x2, y2 - direction) if self._board.isInside(x2, y2 - direction) else None
+            case = self._board.getCase(x2, y2)
             if isinstance(case, Piece):
                 return case.getColor() != self._color
             else:
-                return isinstance(case2, Pawn) and case2.getColor() != self._color and dy == start_pos
-
+                last_move = self._board.history()[-1] if len(self._board.history()) > 0 else None
+                if last_move is not None:
+                    piece, start, end = last_move
+                    if isinstance(piece, Pawn) and  piece.getColor() != self._color and y1 == end[1] and abs(start[1] - end[1]) == 2 and abs(x1 - end[0]) == 1:
+                        return True
         return False
 
     def getMoves(self) -> list[tuple[int, int]]:
@@ -43,9 +45,19 @@ class Pawn(Piece):
 
     def move(self, end: tuple[int, int]):
         if self.canMove(end):
+            x1, y1 = self._position
+            x2, y2 = end
+            last_move = self._board.history()[-1] if len(self._board.history()) > 0 else None
+            if last_move is not None:
+                piece, start, end = last_move
+                if isinstance(piece, Pawn) and piece.getColor() != self._color and y1 == end[1] and abs(start[1] - end[1]) == 2 and abs(x1 - end[0]) == 1:
+                    self._board.setCase(end[0], end[1], None)
+
             self._board.setCase(self._position[0], self._position[1], None)
-            self._board.setCase(end[0], end[1], self)
-            self._position = end
+            self._board.setCase(x2, y2, self)
+
+
+            self._position = (x2, y2)
 
 
 

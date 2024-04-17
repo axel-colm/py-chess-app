@@ -1,3 +1,4 @@
+from .core.functions import Function
 from .qt_core import *
 from .widgets.board import BoardWidget
 from .. import Chess
@@ -8,7 +9,6 @@ from ..player import Player
 
 class MainWindow(QtWidgets.QMainWindow):
     MINIMUM_SIZE = QtCore.QSize(800, 600)
-    _bg_color = "#44475a"
 
     def __init__(self):
         super().__init__()
@@ -24,7 +24,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup_ui(self):
         self._central_widget = QtWidgets.QWidget()
         self.setCentralWidget(self._central_widget)
-        self._central_widget.installEventFilter(self)
 
         self._layout = QtWidgets.QHBoxLayout()
         self._layout.setContentsMargins(2, 2, 2, 2)
@@ -41,6 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._board_widget.released.connect(self._button_released)
         self._content_widget.addWidget(self._board_widget)
 
+        # <editor-fold desc="Start view">
         self._start_view = QtWidgets.QWidget()
         self._content_widget.addWidget(self._start_view)
 
@@ -48,12 +48,60 @@ class MainWindow(QtWidgets.QMainWindow):
         self._start_view_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self._start_view.setLayout(self._start_view_layout)
 
-        self._start_view_button = QtWidgets.QPushButton("Play")
-        self._start_view_button.setFixedSize(200, 50)
-        self._start_view_button.clicked.connect(self._start_game)
-        self._start_view_layout.addWidget(self._start_view_button)
+        self._new_game_button = QtWidgets.QPushButton("New game")
+        self._new_game_button.setFixedSize(200, 50)
+        self._new_game_button.released.connect(self._new_game)
 
-    def _start_game(self):
+        self._load_game_button = QtWidgets.QPushButton("Load game")
+        self._load_game_button.setFixedSize(200, 50)
+        self._load_game_button.released.connect(self._load_game)
+
+        self._start_view_layout.addWidget(self._new_game_button)
+        self._start_view_layout.addWidget(self._load_game_button)
+        # </editor-fold>
+
+        # <editor-fold desc="Choose type game">
+        self._choose_game_type = QtWidgets.QWidget()
+        self._content_widget.addWidget(self._choose_game_type)
+
+        self._choose_game_back_button = QtWidgets.QPushButton()
+        self._choose_game_back_button.setObjectName("back_button_choose")
+        self._choose_game_back_button.setParent(self._choose_game_type)
+        self._choose_game_back_button.setIcon(QtGui.QIcon(Function.icon_path("angle-left.svg")))
+        self._choose_game_back_button.setIconSize(QtCore.QSize(30, 30))
+        self._choose_game_back_button.setGeometry(0, 0, 50, 50)
+        self._choose_game_back_button.setStyleSheet("background-color: transparent; border: none;")
+        self._choose_game_back_button.released.connect(lambda x=self._choose_game_back_button: self._button_released(x))
+
+        self._choose_game_type_layout = QtWidgets.QVBoxLayout()
+        self._choose_game_type_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self._choose_game_type.setLayout(self._choose_game_type_layout)
+
+        self._choose_game_type_label = QtWidgets.QLabel("Choose your adversary:")
+        self._choose_game_type_layout.addWidget(self._choose_game_type_label)
+
+        self._choose_game_type_human = QtWidgets.QPushButton("Player vs Player")
+        self._choose_game_type_human.setFixedSize(200, 50)
+        self._choose_game_type_human.setObjectName("choose_game_type_human")
+        self._choose_game_type_human.released.connect(lambda x=self._choose_game_type_human: self._button_released(x))
+
+        self._choose_game_type_ai = QtWidgets.QPushButton("Player vs AI")
+        self._choose_game_type_ai.setFixedSize(200, 50)
+        self._choose_game_type_ai.setObjectName("choose_game_type_ai")
+        self._choose_game_type_ai.released.connect(lambda x=self._choose_game_type_ai: self._button_released(x))
+
+        self._choose_game_type_layout.addWidget(self._choose_game_type_human)
+        self._choose_game_type_layout.addWidget(self._choose_game_type_ai)
+
+        # </editor-fold>
+
+    def _new_game(self):
+        self._content_widget.setCurrentWidget(self._choose_game_type)
+
+    def _choose_ai(self):
+        self._stop_game()  # Temporary
+
+    def _start_game(self, ai=False):
         p1 = Player(self._board, Color.WHITE)
         p2 = Player(self._board, Color.BLACK)
         self._board.initialize(p1, p2)
@@ -61,6 +109,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _stop_game(self):
         self._content_widget.setCurrentWidget(self._start_view)
+
+    def _load_game(self):
+        pass
 
     def _button_released(self, btn: QtWidgets.QWidget):
         if btn.objectName() == "back_button":
@@ -71,25 +122,16 @@ class MainWindow(QtWidgets.QMainWindow):
             dialog.setDefaultButton(QtWidgets.QMessageBox.StandardButton.No)
             if dialog.exec() == QtWidgets.QMessageBox.StandardButton.Yes:
                 self._stop_game()
-
+        elif btn.objectName() == "back_button_choose":
+            self._content_widget.setCurrentWidget(self._start_view)
+        elif btn.objectName() == "choose_game_type_human":
+            self._start_game()
+        elif btn.objectName() == "choose_game_type_ai":
+            self._choose_ai()
 
 
     def _button_clicked(self, btn):
         pass
-
-    def eventFilter(self, watched, event):
-        if watched == self._central_widget and event.type() == QtCore.QEvent.Type.Paint:
-            self._paint_background()
-        return super().eventFilter(watched, event)
-
-    def _paint_background(self):
-        painter = QtGui.QPainter(self._central_widget)
-        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        painter.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform)
-
-        painter.setPen(QtCore.Qt.PenStyle.NoPen)
-        painter.setBrush(QtGui.QBrush(QtGui.QColor(self._bg_color)))
-        painter.drawRect(self.rect())
 
 
 

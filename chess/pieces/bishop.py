@@ -27,7 +27,7 @@ class Bishop(Piece):
                     x = self.getPosition()[0] + i * x_shift
                     y = self.getPosition()[1] + i * y_shift
                     if self._board.isInside(x, y):
-                        piece = self._board.getCases(x, y)
+                        piece = self._board.getCase(x, y)
                         if piece is None:
                             moves.append((x, y))
                         else:
@@ -44,7 +44,7 @@ class Bishop(Piece):
 
         if abs(x1 - x2) == abs(y1 - y2):
             for i in range(1, abs(x1 - x2)):
-                if self._board.getCases(x1 + i * (1 if x2 > x1 else -1), y1 + i * (1 if y2 > y1 else -1)) is not None:
+                if self._board.getCase(x1 + i * (1 if x2 > x1 else -1), y1 + i * (1 if y2 > y1 else -1)) is not None:
                     return False
             return True
         return False

@@ -29,7 +29,7 @@ class Board(ABC):
         self._turn = None
 
     @abstractmethod
-    def initialize(self):
+    def initialize(self, p1, p2):
         pass
 
     @abstractmethod
@@ -43,7 +43,7 @@ class Board(ABC):
     def turnColor(self) -> Color | None:
         return self._turn
 
-    def getCases(self, x: int, y: int) -> Piece | None:
+    def getCase(self, x: int, y: int) -> Piece | None:
         if not self.isInside(x, y):
             raise BoardException(1)
         return self._board[x][y]
@@ -58,7 +58,7 @@ class Board(ABC):
         self._board[x][y] = piece
 
     def move(self, start: tuple[int, int], end: tuple[int, int]):
-        piece = self.getCases(start[0], start[1])
+        piece = self.getCase(start[0], start[1])
         if piece is None:
             raise BoardException(2)
         if piece.canMove(end):

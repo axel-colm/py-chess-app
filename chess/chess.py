@@ -44,10 +44,10 @@ class Chess(Board):
 
         for color in (Color.WHITE, Color.BLACK):
             for x in range(8):
-                self.setCase(x, 1 if color == Color.WHITE else 6, Pawn(self, color, (x, 1 if color == Color.WHITE else 6)))
+                self.setCase(x, 1 if color == Color.BLACK else 6, Pawn(self, color, (x, 1 if color == Color.BLACK else 6)))
 
             for x, piece in enumerate((Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)):
-                self.setCase(x, 0 if color == Color.WHITE else 7, piece(self, color, (x, 0 if color == Color.WHITE else 7)))
+                self.setCase(x, 0 if color == Color.BLACK else 7, piece(self, color, (x, 0 if color == Color.BLACK else 7)))
 
         self._turn = Color.WHITE
 
